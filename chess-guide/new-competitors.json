@@ -1,0 +1,14 @@
+[
+  {
+    "Name": "Adam",
+    "Elo": 100
+  },
+  {
+    "Name": "David",
+    "Elo": 200
+  },
+  {
+    "Name": "Gabor",
+    "Elo": 300
+  }
+]
