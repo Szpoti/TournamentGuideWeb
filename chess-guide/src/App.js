@@ -1,4 +1,5 @@
 import logo from "./chessQueen.png";
+import React, { useState, useEffect } from 'react';
 import "./App.css";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -7,6 +8,73 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Accordion from "react-bootstrap/Accordion";
 
 function App() {
+		/** @type {Player[]} */
+	const [players, setPlayers] = useState([]);
+	const [rounds, setRounds] = useState([]);
+
+	useEffect(() => {
+        fetch('https://localhost:7059/Player/players')
+            .then(response => response.json())
+			.then(data => {
+				const players = data.map(playerData => new Player(
+					playerData.name,
+					playerData.elo,
+					playerData.id,
+					playerData.gamesWon,
+					playerData.gamesDrawed,
+					playerData.gamesLost,
+					playerData.gamesPlayed,
+					playerData.points
+				));
+				players.sort((playerA, playerB) => playerB.points - playerA.points);
+				setPlayers(players);})
+            .catch(error => console.error('Error fetching data:', error));
+
+		fetch('https://localhost:7059/Round/rounds')
+			.then(response => response.json())
+			.then(data => {
+				const roundsData  = data.map(roundData => new Round(
+					roundData.id,
+					new PlayerInfo(roundData.player1.id, roundData.player1.colour),
+					new PlayerInfo(roundData.player2.id, roundData.player2.colour),
+					roundData.isDraw,
+					roundData.matchLink,
+					roundData.winnerColour,
+					roundData.loserColour
+				));
+				setRounds(roundsData );
+			})
+			.catch(error => console.error('Error fetching rounds:', error));
+    }, []); // Empty dependency array means this effect runs once on mount
+
+	    // Function to get player's game details
+		const getPlayerGames = (playerId) => {
+			return rounds.filter(round => round.player1.id === playerId || round.player2.id === playerId)
+						 .map((round, index) => {
+							let playerInfo;
+							let opponentInfo;
+							if(round.player1.id === playerId)
+							{
+								playerInfo = round.player1;
+								opponentInfo = round.player2;
+							}
+							else
+							{
+								playerInfo = round.player2;
+								opponentInfo = round.player1;
+							}
+
+							let result = round.isDraw ? 'Draw' : (round.winnerColour === playerInfo.colour ? 'Won' : 'Lost');
+							let playerColor = playerInfo.colour;
+							let opponentName = players.find(opp => opp.id === opponentInfo.id).name;
+							return (
+								 <div key={index}>
+									 <p>vs {opponentName} : {result} with {playerColor} - <a href={round.matchLink} target="_blank" rel="noopener noreferrer">Link</a></p>
+								 </div>
+							 );
+						 });
+		};
+
 	return (
 		<div className="App">
 			<header className="App-header">
@@ -19,57 +87,18 @@ function App() {
 					<h1>Losing a game: 0 points</h1>
 					<h1>Draw: 1 points each</h1>
 				</div>
-				<hr class="separator" />
-				<div class="accordions">
+				<hr className="separator" />
+				<div className="accordions">
 					<Accordion>
-						<Accordion.Item eventKey="0">
-							<Accordion.Header>Szpoti - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="1">
-							<Accordion.Header>Dani - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="2">
-							<Accordion.Header>Clement - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="3">
-							<Accordion.Header>Roland - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="4">
-							<Accordion.Header>Marnix - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="5">
-							<Accordion.Header>Thib - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="6">
-							<Accordion.Header>David - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="7">
-							<Accordion.Header>Adam - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="8">
-							<Accordion.Header>Rafe - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="9">
-							<Accordion.Header>Max - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="10">
-							<Accordion.Header>Szabolcs - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
-						<Accordion.Item eventKey="11">
-							<Accordion.Header>Lucas - 0 points</Accordion.Header>
-							<Accordion.Body></Accordion.Body>
-						</Accordion.Item>
+					{players.map((player, index) => (
+                        <Accordion.Item eventKey={index.toString()} key={player.id}>
+                            <Accordion.Header>{player.name} (Elo: {player.elo}) - {player.points} points</Accordion.Header>
+                            <Accordion.Body>
+                                {/* Additional details about the player can go here */}
+								{getPlayerGames(player.id)}
+                            </Accordion.Body>
+                        </Accordion.Item>
+                    ))}
 					</Accordion>
 				</div>
 				<a
@@ -113,11 +142,61 @@ function NavbarMenu() {
 	);
 }
 
+
+/**
+ * @param {string} name - The name of the player.
+ * @param {number} elo - The elo rating of the player.
+ * @param {string} id - The unique identifier for the player.
+ * @param {number} gamesWon - The number of games won by the player.
+ * @param {number} gamesDrawed - The number of games drawn by the player.
+ * @param {number} gamesLost - The number of games lost by the player.
+ * @param {number} gamesPlayed - The total number of games played by the player.
+ * @param {number} points - The total points earned by the player.
+ **/
 class Player {
-	constructor(name, elo) {
-		this.name = name;
-		this.elo = elo;
-	}
+    constructor(name, elo, id, gamesWon, gamesDrawed, gamesLost, gamesPlayed, points) {
+        this.name = name || '';
+        this.elo = elo || 0;
+        this.id = id || '';
+        this.gamesWon = gamesWon || 0;
+        this.gamesDrawed = gamesDrawed || 0;
+        this.gamesLost = gamesLost || 0;
+		this.gamesPlayed = gamesPlayed || 0;
+		this.points = points || 0;
+    }
+}
+
+/**
+ * @typedef {Object} PlayerInfo
+ * @property {string} id - The unique identifier for the player.
+ * @property {string} colour - The color representing the player.
+ */
+class PlayerInfo {
+    constructor(id, colour) {
+        this.id = id;
+        this.colour = colour;
+    }
+}
+
+/**
+ * @param {string} id - The unique identifier for the round.
+ * @param {PlayerInfo} player1 - Information about the first player.
+ * @param {PlayerInfo} player2 - Information about the second player.
+ * @param {boolean} isDraw - Indicates if the round is a draw.
+ * @param {string} matchLink - The link to the match.
+ * @param {string} winnerColour - The color representing the winner.
+ * @param {string} loserColour - The color representing the loser.
+ */
+class Round {
+    constructor(id, player1, player2, isDraw, matchLink, winnerColour, loserColour) {
+        this.id = id;
+        this.player1 = player1;
+        this.player2 = player2;
+        this.isDraw = isDraw;
+        this.matchLink = matchLink;
+        this.winnerColour = winnerColour;
+        this.loserColour = loserColour;
+    }
 }
 
 export { App, NavbarMenu };
