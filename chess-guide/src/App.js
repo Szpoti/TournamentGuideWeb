@@ -1,5 +1,6 @@
 import logo from "./chessQueen.png";
 import React, { useState, useEffect } from 'react';
+import queryString from 'query-string';
 import "./App.css";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -11,8 +12,17 @@ function App() {
 		/** @type {Player[]} */
 	const [players, setPlayers] = useState([]);
 	const [rounds, setRounds] = useState([]);
+	const [isAdmin, setIsAdmin] = useState(false);
 
 	useEffect(() => {
+		const parsedQueryString = queryString.parse(window.location.search);
+        const adminKey = parsedQueryString.adminKey;
+
+		fetch(`https://localhost:7059/Admin/login?apiKey=${adminKey}`)
+		.then(response => response.json())
+		.then(data => setIsAdmin(data))
+		.catch(error => console.error('Error fetching data:', error));
+
         fetch('https://localhost:7059/Player/players')
             .then(response => response.json())
 			.then(data => {
@@ -78,6 +88,11 @@ function App() {
 	return (
 		<div className="App">
 			<header className="App-header">
+				{
+					isAdmin && (
+						<p>Logged in as Admin</p>
+					)
+				}
 				<img src={logo} className="App-logo" alt="logo" />
 				<div>
 					<h1>
