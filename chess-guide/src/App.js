@@ -107,8 +107,9 @@ function App() {
 					<Accordion>
 					{players.map((player, index) => (
                         <Accordion.Item eventKey={index.toString()} key={player.id}>
-                            <Accordion.Header>{player.name} (Elo: {player.elo}) - {player.points} points</Accordion.Header>
-                            <Accordion.Body>
+                            <Accordion.Header>
+								<div className="accordion-header">{player.name} (Elo: {player.elo}) - {player.points} points</div></Accordion.Header>
+                            <Accordion.Body className="accordion-item">
                                 {/* Additional details about the player can go here */}
 								{getPlayerGames(player.id)}
                             </Accordion.Body>

@@ -5,7 +5,8 @@
   },
   {
     "Name": "Dani",
-    "Elo": 200
+    "Elo": 300,
+	"Rating": 2
   },
   {
     "Name": "Clement",
@@ -13,11 +14,13 @@
   },
   {
     "Name": "Roland",
-    "Elo": 200
+    "Elo": 300,
+	"Rating": 2
   },
   {
     "Name": "Marnix",
-    "Elo": 200
+    "Elo": 400,
+	"Rating": 3
   },
   {
     "Name": "Thib",
