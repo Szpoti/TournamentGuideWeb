@@ -13,17 +13,18 @@ function App() {
 	const [players, setPlayers] = useState([]);
 	const [rounds, setRounds] = useState([]);
 	const [isAdmin, setIsAdmin] = useState(false);
+	const backendUri =  "https://localhost:7059";
 
 	useEffect(() => {
 		const parsedQueryString = queryString.parse(window.location.search);
         const adminKey = parsedQueryString.adminKey;
 
-		fetch(`https://localhost:7059/Admin/login?apiKey=${adminKey}`)
+		fetch(`${backendUri}/Admin/login?apiKey=${adminKey}`)
 		.then(response => response.json())
 		.then(data => setIsAdmin(data))
 		.catch(error => console.error('Error fetching data:', error));
 
-        fetch('https://localhost:7059/Player/players')
+        fetch(`${backendUri}/Player/players`)
             .then(response => response.json())
 			.then(data => {
 				const players = data.map(playerData => new Player(
@@ -40,7 +41,7 @@ function App() {
 				setPlayers(players);})
             .catch(error => console.error('Error fetching data:', error));
 
-		fetch('https://localhost:7059/Round/rounds')
+		fetch(`${backendUri}/Round/rounds`)
 			.then(response => response.json())
 			.then(data => {
 				const roundsData  = data.map(roundData => new Round(
@@ -85,6 +86,10 @@ function App() {
 						 });
 		};
 
+		const displayRoundRegisterForm = () => {
+			return <div>Form</div>
+		};
+
 	return (
 		<div className="App">
 			<header className="App-header">
@@ -117,6 +122,14 @@ function App() {
                     ))}
 					</Accordion>
 				</div>
+				{
+					isAdmin && (
+						<div>
+					<h1>Register Round</h1>
+					<RoundRegisterForm players={players} backendUri={backendUri}/>
+				</div>
+					)
+				}
 				<a
 					className="App-link"
 					href="https://reactjs.org"
@@ -157,6 +170,115 @@ function NavbarMenu() {
 		</Navbar>
 	);
 }
+
+function RoundRegisterForm({ players, backendUri }) {
+    const [player1Id, setPlayer1Id] = useState('');
+    const [player2Id, setPlayer2Id] = useState('');
+    const [isDraw, setIsDraw] = useState(false);
+    const [winnerColour, setWinnerColour] = useState('');
+    const [matchLink, setMatchLink] = useState('');
+
+	const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Determine winner and loser based on the selected colors and result
+        let winnerId, loserId;
+        if (!isDraw) {
+            winnerId = winnerColour === 'White' ? player1Id : player2Id;
+            loserId = winnerColour === 'Black' ? player1Id : player2Id;
+        }
+
+        const data = {
+            player1: {
+                id: player1Id,
+                colour: 'White',
+            },
+            player2: {
+                id: player2Id,
+                colour: 'Black',
+            },
+            isDraw,
+            matchLink,
+            winnerColour: isDraw ? null : winnerColour,
+            loserColour: isDraw ? null : (winnerColour === 'Black' ? 'White' : 'Black')
+        };
+
+        // Send data to server
+        try {
+            const response = await fetch(`${backendUri}/Round/add-round`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            } else {
+                const result = await response.json();
+                console.log(result);
+                // Handle success response
+            }
+        } catch (error) {
+            console.error('Error posting data:', error);
+            // Handle errors here
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <div>
+                <label>
+                    White:
+                    <select value={player1Id} onChange={e => setPlayer1Id(e.target.value)}>
+                        <option value="">Select Player</option>
+                        {players.map(player => (
+                            <option key={player.id} value={player.id}>{player.name}</option>
+                        ))}
+                    </select>
+                </label>
+            </div>
+            <div>
+                <label>
+                    Black:
+                    <select value={player2Id} onChange={e => setPlayer2Id(e.target.value)}>
+                        <option value="">Select Player</option>
+                        {players.map(player => (
+                            <option key={player.id} value={player.id}>{player.name}</option>
+                        ))}
+                    </select>
+                </label>
+            </div>
+            <div>
+                <label>
+                    Draw:
+                    <input type="checkbox" checked={isDraw} onChange={e => setIsDraw(e.target.checked)} />
+                </label>
+            </div>
+            {!isDraw && (
+                <div>
+                    <label>
+                        Winner Colour:
+                        <select value={winnerColour} onChange={e => setWinnerColour(e.target.value)}>
+                            <option value="">Select Colour</option>
+                            <option value="White">White</option>
+                            <option value="Black">Black</option>
+                        </select>
+                    </label>
+                </div>
+            )}
+            <div>
+                <label>
+                    Match's link:
+                    <input type="text" value={matchLink} onChange={e => setMatchLink(e.target.value)} placeholder="Match's link" />
+                </label>
+            </div>
+            <button type="submit">SUBMIT</button>
+        </form>
+    );
+}
+
 
 
 /**
