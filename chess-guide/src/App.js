@@ -58,6 +58,24 @@ function App() {
 			.catch(error => console.error('Error fetching rounds:', error));
     }, []); // Empty dependency array means this effect runs once on mount
 
+	const handleRemoveRound = async (roundId) => {
+        try {
+            const response = await fetch(`http://localhost:5181/Round/remove-round/${roundId}`, {
+                method: 'DELETE',
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            } else {
+                // Handle successful removal
+                console.log('Round removed successfully');
+                // Optionally, update the state to reflect the change
+            }
+        } catch (error) {
+            console.error('Error removing round:', error);
+        }
+    };
+
 	    // Function to get player's game details
 		const getPlayerGames = (playerId) => {
 			return rounds.filter(round => round.player1.id === playerId || round.player2.id === playerId)
@@ -78,9 +96,22 @@ function App() {
 							let result = round.isDraw ? 'Draw' : (round.winnerColour === playerInfo.colour ? 'Won' : 'Lost');
 							let playerColor = playerInfo.colour;
 							let opponentName = players.find(opp => opp.id === opponentInfo.id).name;
+							if(isAdmin)
+							{
+								return (
+									<div key={index}>
+										<p>vs {opponentName} : {result} with {playerColor} - 
+										<a href={round.matchLink} target="_blank" rel="noopener noreferrer">Link</a>
+										</p>
+										<button onClick={() => handleRemoveRound(round.id)} style={{color: 'red'}}>X</button>
+									</div>
+								);
+							}
 							return (
 								 <div key={index}>
-									 <p>vs {opponentName} : {result} with {playerColor} - <a href={round.matchLink} target="_blank" rel="noopener noreferrer">Link</a></p>
+									 <p>vs {opponentName} : {result} with {playerColor} - 
+									 <a href={round.matchLink} target="_blank" rel="noopener noreferrer">Link</a>
+									 </p>
 								 </div>
 							 );
 						 });
