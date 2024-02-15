@@ -13,7 +13,7 @@ function App() {
 	const [players, setPlayers] = useState([]);
 	const [rounds, setRounds] = useState([]);
 	const [isAdmin, setIsAdmin] = useState(false);
-	const backendUri =  "https://localhost:7059";
+	const backendUri =  "https://tournamentguideserverapi.azurewebsites.net";
 
 	useEffect(() => {
 		const parsedQueryString = queryString.parse(window.location.search);
