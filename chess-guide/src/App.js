@@ -60,7 +60,7 @@ function App() {
 
 	const handleRemoveRound = async (roundId) => {
         try {
-            const response = await fetch(`http://localhost:5181/Round/remove-round/${roundId}`, {
+            const response = await fetch(`${backendUri}/Round/remove-round/${roundId}`, {
                 method: 'DELETE',
             });
             
