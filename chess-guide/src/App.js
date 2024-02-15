@@ -60,9 +60,7 @@ function App() {
 
 	const handleRemoveRound = async (roundId) => {
         try {
-            const response = await fetch(`${backendUri}/Round/remove-round/${roundId}`, {
-                method: 'DELETE',
-            });
+            const response = await fetch(`${backendUri}/Round/remove-round/${roundId}`);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
