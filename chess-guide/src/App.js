@@ -170,7 +170,7 @@ function App() {
 	);
 }
 
-function PlayerAddForm(backendUri) {
+function PlayerAddForm({ backendUri }) {
     const [playerName, setPlayerName] = useState('');
     const [elo, setElo] = useState(0);
 
