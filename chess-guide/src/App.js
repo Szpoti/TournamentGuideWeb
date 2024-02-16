@@ -115,10 +115,6 @@ function App() {
 						 });
 		};
 
-		const displayRoundRegisterForm = () => {
-			return <div>Form</div>
-		};
-
 	return (
 		<div className="App">
 			<header className="App-header">
@@ -156,6 +152,8 @@ function App() {
 						<div>
 					<h1>Register Round</h1>
 					<RoundRegisterForm players={players} backendUri={backendUri}/>
+					<h1>Add player</h1>
+					<PlayerAddForm backendUri={backendUri}></PlayerAddForm>
 				</div>
 					)
 				}
@@ -170,6 +168,65 @@ function App() {
 			</header>
 		</div>
 	);
+}
+
+function PlayerAddForm(backendUri) {
+    const [playerName, setPlayerName] = useState('');
+    const [elo, setElo] = useState(0);
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const playerData = {
+            name: playerName,
+            elo: elo
+        };
+
+        try {
+            const response = await fetch(`${backendUri}/Player/add-player`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(playerData),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            } else {
+                console.log('Player added successfully');
+                // Handle successful response
+            }
+        } catch (error) {
+            console.error('Error adding player:', error);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <div>
+                <label>
+                    Player Name:
+                    <input 
+                        type="text" 
+                        value={playerName} 
+                        onChange={(e) => setPlayerName(e.target.value)} 
+                    />
+                </label>
+            </div>
+            <div>
+                <label>
+                    ELO:
+                    <input 
+                        type="number" 
+                        value={elo} 
+                        onChange={(e) => setElo(parseInt(e.target.value, 10))} 
+                    />
+                </label>
+            </div>
+            <button type="submit">ADD</button>
+        </form>
+    );
 }
 
 function NavbarMenu() {
