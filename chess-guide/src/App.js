@@ -285,8 +285,8 @@ function RoundRegisterForm({ players, backendUri }) {
             },
             isDraw,
             matchLink,
-            winnerColour: isDraw ? null : winnerColour,
-            loserColour: isDraw ? null : (winnerColour === 'Black' ? 'White' : 'Black')
+            winnerColour: isDraw ? "" : winnerColour,
+            loserColour: isDraw ? "" : (winnerColour === 'Black' ? 'White' : 'Black')
         };
 
         // Send data to server
