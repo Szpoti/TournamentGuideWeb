@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/TournamentGuideWeb/static/css/main.3eeffa7b.css",
-    "main.js": "/TournamentGuideWeb/static/js/main.ac360b68.js",
+    "main.js": "/TournamentGuideWeb/static/js/main.5bbafb6c.js",
     "static/js/787.dbaaa1fb.chunk.js": "/TournamentGuideWeb/static/js/787.dbaaa1fb.chunk.js",
     "static/media/chessQueen.png": "/TournamentGuideWeb/static/media/chessQueen.71b0c6ccb3526c2db0fe.png",
     "index.html": "/TournamentGuideWeb/index.html",
     "main.3eeffa7b.css.map": "/TournamentGuideWeb/static/css/main.3eeffa7b.css.map",
-    "main.ac360b68.js.map": "/TournamentGuideWeb/static/js/main.ac360b68.js.map",
+    "main.5bbafb6c.js.map": "/TournamentGuideWeb/static/js/main.5bbafb6c.js.map",
     "787.dbaaa1fb.chunk.js.map": "/TournamentGuideWeb/static/js/787.dbaaa1fb.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.3eeffa7b.css",
-    "static/js/main.ac360b68.js"
+    "static/js/main.5bbafb6c.js"
   ]
 }
